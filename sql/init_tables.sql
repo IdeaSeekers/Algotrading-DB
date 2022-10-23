@@ -1,3 +1,5 @@
+\c algotrading
+
 CREATE TABLE IF NOT EXISTS Strategies (
     id SERIAL PRIMARY KEY,
     name VARCHAR,
@@ -159,10 +161,26 @@ $$;
 
 ------------------------------------------------------------------------------------------------------------------------------------------
 --
+--                                                        BOTS GET
+--
+------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE FUNCTION get_bot_strategy(cur_bot_id INT)
+RETURNS INT
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+   RETURN (SELECT strategy_id FROM Bots WHERE id = cur_bot_id);
+END;
+$$;
+
+------------------------------------------------------------------------------------------------------------------------------------------
+--
 --                                                        PARAMETERS GET
 --
 ------------------------------------------------------------------------------------------------------------------------------------------
--- TODO DEFAULTS
+
 CREATE FUNCTION get_int_parameter(param_id INT, cur_bot_id INT)
 RETURNS INT
 LANGUAGE plpgsql
@@ -171,11 +189,19 @@ $$
 DECLARE
     val INT;
 BEGIN
-   IF EXISTS ( SELECT value INTO val FROM DoubleBotHyperparameters WHERE parameter_id = param_id AND bot_id = cur_bot_id ) THEN
+   IF EXISTS ( SELECT value INTO val FROM IntBotHyperparameters WHERE parameter_id = param_id AND bot_id = cur_bot_id ) THEN
         RETURN val;
    END IF;
 
-   RETURN 0;
+   RETURN 
+        (SELECT value 
+         FROM IntHyperparameters 
+         WHERE id = (
+            SELECT parameter_id 
+            FROM IntHyperparametersOfStrategies 
+            WHERE strategy_id = (SELECT get_bot_strategy(cur_bot_id))
+            )
+        );
 END;
 $$;
 
@@ -192,6 +218,14 @@ BEGIN
         RETURN val;
    END IF;
 
-   RETURN 0;
+   RETURN 
+        (SELECT value 
+         FROM DoubleHyperparameters 
+         WHERE id = (
+            SELECT parameter_id 
+            FROM DoubleHyperparametersOfStrategies 
+            WHERE strategy_id = (SELECT get_bot_strategy(cur_bot_id))
+            )
+        );
 END;
 $$;
