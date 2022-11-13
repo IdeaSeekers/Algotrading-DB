@@ -1,3 +1,6 @@
+DROP DATABASE IF EXISTS Algotrading;
+CREATE DATABASE Algotrading;
+
 \c algotrading
 
 CREATE TABLE IF NOT EXISTS Strategies (
