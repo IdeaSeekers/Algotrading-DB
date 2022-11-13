@@ -215,6 +215,16 @@ BEGIN
 END;
 $$;
 
+CREATE FUNCTION get_bots_by_strategy(strat_id INT)
+RETURNS TABLE (bot_id INT)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    RETURN QUERY (SELECT id FROM Bots WHERE strategy_id = strat_id);
+END;
+$$;
+
 ------------------------------------------------------------------------------------------------------------------------------------------
 --
 --                                                        PARAMETERS GET  (TODO MAX)
