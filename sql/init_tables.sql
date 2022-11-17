@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS DoubleBotHyperparameters  (
 );
 
 CREATE TABLE IF NOT EXISTS OperationType (
-    id SERIAL PRIMARY KEY,
+    id VARCHAR PRIMARY KEY,
     name VARCHAR
 );
 
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS BotsOperations (
     bot_id INT REFERENCES Bots(id),
     op_id INT REFERENCES OperationType(id),
 
-    stock_id INT,
+    stock_id VARCHAR,
     stock_count INT,
     stock_cost DOUBLE PRECISION,
     op_time TIMESTAMP
@@ -281,7 +281,7 @@ $$;
 --
 ------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE FUNCTION add_operation(bot_id INT, op_id INT, stock_id INT, stock_count INT, stock_cost DOUBLE PRECISION, op_time TIMESTAMP)
+CREATE FUNCTION add_operation(bot_id INT, op_id INT, stock_id VARCHAR, stock_count INT, stock_cost DOUBLE PRECISION, op_time TIMESTAMP)
 RETURNS void
 LANGUAGE plpgsql
 AS
@@ -298,7 +298,7 @@ END;
 $$;
 
 CREATE FUNCTION get_operations(cur_bot_id INT)
-RETURNS TABLE(_op_id INT, _stock_id INT, _stock_count INT, _stock_cost DOUBLE PRECISION, _op_time TIMESTAMP)
+RETURNS TABLE(_op_id INT, _stock_id VARCHAR, _stock_count INT, _stock_cost DOUBLE PRECISION, _op_time TIMESTAMP)
 LANGUAGE plpgsql
 AS
 $$
