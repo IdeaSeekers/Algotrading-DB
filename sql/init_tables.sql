@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS DoubleBotHyperparameters  (
 );
 
 CREATE TABLE IF NOT EXISTS OperationType (
-    id VARCHAR PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name VARCHAR
 );
 
