@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS IntHyperparameters (
 CREATE TABLE IF NOT EXISTS StringHyperparameters (
     id SERIAL PRIMARY KEY,
     name VARCHAR,
-    default_value Text,
+    default_value VARCHAR,
     description TEXT
 );
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS DoubleBotHyperparameters  (
 
 CREATE TABLE IF NOT EXISTS StringBotHyperparameters  (
     rel_id SERIAL PRIMARY KEY,
-    value INT,
+    value VARCHAR,
     bot_id INT REFERENCES Bots(id),
     parameter_id INT REFERENCES StringHyperparametersOfStrategies (rel_id),
     UNIQUE (bot_id, parameter_id)
@@ -156,7 +156,7 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION create_string_parameter(param_name VARCHAR, param_description TEXT, default_param_value TEXT)
+CREATE FUNCTION create_string_parameter(param_name VARCHAR, param_description TEXT, default_param_value VARCHAR)
 RETURNS INT
 LANGUAGE plpgsql
 AS
@@ -248,7 +248,7 @@ BEGIN
 END;
 $$;
 
-CREATE FUNCTION set_string_parameter(rel_param_id INT, cur_bot_id INT, new_value TEXT)
+CREATE FUNCTION set_string_parameter(rel_param_id INT, cur_bot_id INT, new_value VARCHAR)
 RETURNS void
 LANGUAGE plpgsql
 AS
@@ -320,7 +320,7 @@ LANGUAGE plpgsql
 AS
 $$
 DECLARE
-    default_val INT;
+    default_val DOUBLE PRECISION;
 BEGIN
    default_val = (SELECT default_value 
          FROM DoubleHyperparameters 
@@ -340,7 +340,7 @@ LANGUAGE plpgsql
 AS
 $$
 DECLARE
-    default_val INT;
+    default_val VARCHAR;
 BEGIN
     default_val = (SELECT default_value 
          FROM StringHyperparameters 
