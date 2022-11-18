@@ -288,6 +288,17 @@ BEGIN
 END;
 $$;
 
+
+CREATE FUNCTION get_bot_name(cur_bot_id INT)
+RETURNS VARCHAR
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+   RETURN (SELECT name FROM Bots WHERE id = cur_bot_id);
+END;
+$$;
+
 ------------------------------------------------------------------------------------------------------------------------------------------
 --
 --                                                        PARAMETERS GET  (TODO MAX)
