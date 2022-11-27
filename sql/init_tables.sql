@@ -221,7 +221,7 @@ END;
 $$;
 
 CREATE FUNCTION get_operations(cur_bot_id INT)
-RETURNS TABLE(_op_id INT, _stock_id INT, _stock_count INT, _stock_cost DOUBLE PRECISION, _op_time TIMESTAMP)
+RETURNS TABLE(_op_id INT, _bot_balance DOUBLE PRECISION, _stock_id INT, _stock_count INT, _stock_cost DOUBLE PRECISION, _op_time TIMESTAMP)
 LANGUAGE plpgsql
 AS
 $$
