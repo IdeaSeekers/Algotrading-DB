@@ -4,7 +4,6 @@ CREATE DATABASE algotrading;
 \c algotrading
 
 CREATE TABLE IF NOT EXISTS Users (
-    id SERIAL PRIMARY KEY,
     username VARCHAR UNIQUE,
     password VARCHAR,
     tinkoff_token VARCHAR
@@ -15,7 +14,7 @@ CREATE TABLE IF NOT EXISTS Bots (
     id SERIAL PRIMARY KEY,
     name VARCHAR,
     strategy_id INT,
-    user_id INT REFERENCES Users(id) 
+    owner_username VARCHAR REFERENCES Users(username) 
 );
 
 CREATE TABLE IF NOT EXISTS IntBotHyperparameters  (
@@ -64,7 +63,7 @@ INSERT INTO OperationType(name) VALUES ('buy'), ('sell');
 --
 ------------------------------------------------------------------------------------------------------------------------------------------
 
-CREATE FUNCTION create_bot(bot_name VARCHAR, strategy_id INT, bot_user_id INT)
+CREATE FUNCTION create_bot(bot_name VARCHAR, strategy_id INT, user_owner VARCHAR)
 RETURNS INT
 LANGUAGE plpgsql
 AS
@@ -72,7 +71,7 @@ $$
 DECLARE
     result INT;
 BEGIN
-   INSERT INTO Bots(name, strategy_id, user_id) VALUES (bot_name, strategy_id, bot_user_id) RETURNING id INTO result;
+   INSERT INTO Bots(name, strategy_id, owner_username) VALUES (bot_name, strategy_id, user_owner) RETURNING id INTO result;
    RETURN result;
 END;
 $$;
@@ -261,31 +260,26 @@ $$;
 
 
 CREATE FUNCTION create_user(input_username VARCHAR, input_password VARCHAR, input_tinkoff_token VARCHAR)
-RETURNS INT
+RETURNS VOID
 LANGUAGE plpgsql
 AS
 $$
-DECLARE
-    result INT;
 BEGIN
-   INSERT INTO Users(username, password, tinkoff_token) VALUES (input_username, input_password, input_tinkoff_token) RETURNING id INTO result;
-   RETURN result;
+   INSERT INTO Users(username, password, tinkoff_token) VALUES (input_username, input_password, input_tinkoff_token);
 END;
 $$;
 
-CREATE FUNCTION get_user(user_id INT)
+CREATE FUNCTION get_user(wanted_username VARCHAR)
 RETURNS TABLE(username VARCHAR, password VARCHAR, tinkoff_token VARCHAR)
 LANGUAGE plpgsql
 AS
 $$
 BEGIN
-   RETURN QUERY (SELECT u.username, u.password, u.tinkoff_token FROM Users u WHERE u.id = user_id);
+   RETURN QUERY (SELECT u.username, u.password, u.tinkoff_token FROM Users u WHERE u.username = wanted_username);
 END;
 $$;
 
-
-
-CREATE FUNCTION set_user_tinkoff_token(user_id INT, new_token VARCHAR)
+CREATE FUNCTION set_user_tinkoff_token(wanted_username VARCHAR, new_token VARCHAR)
 RETURNS VOID
 LANGUAGE plpgsql
 AS
@@ -293,7 +287,7 @@ $$
 BEGIN
    UPDATE Users u
     SET tinkoff_token = new_token
-    WHERE id = user_id;
+    WHERE username = wanted_username;
 END;
 $$;
 
